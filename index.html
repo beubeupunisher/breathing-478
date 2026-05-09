@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="4-7-8">
+<meta name="theme-color" content="#0A0A0A">
+<title>4-7-8 BREATH</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0A0A0A;
+    --fg: #E8E8E8;
+    --dim: #4A4A4A;
+    --accent: #A00000;
+    --accent-bright: #D81515;
+    --inhale: #2A6B8C;
+    --hold: #B89030;
+    --exhale: #6B2A8C;
+  }
+
+- { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+height: 100%;
+width: 100%;
+overflow: hidden;
+background: var(–bg);
+color: var(–fg);
+font-family: ‘JetBrains Mono’, monospace;
+user-select: none;
+-webkit-user-select: none;
+overscroll-behavior: none;
+}
+
+body {
+display: flex;
+flex-direction: column;
+padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+position: relative;
+}
+
+/* Grain background */
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 200 200’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘n’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘3’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23n)’ opacity=‘0.4’/%3E%3C/svg%3E”);
+opacity: 0.05;
+pointer-events: none;
+z-index: 1;
+}
+
+/* Corner marks - tactical style */
+.corner {
+position: fixed;
+width: 18px;
+height: 18px;
+border-color: var(–dim);
+border-style: solid;
+z-index: 5;
+pointer-events: none;
+}
+.corner.tl { top: calc(env(safe-area-inset-top) + 16px); left: 16px; border-width: 1px 0 0 1px; }
+.corner.tr { top: calc(env(safe-area-inset-top) + 16px); right: 16px; border-width: 1px 1px 0 0; }
+.corner.bl { bottom: calc(env(safe-area-inset-bottom) + 16px); left: 16px; border-width: 0 0 1px 1px; }
+.corner.br { bottom: calc(env(safe-area-inset-bottom) + 16px); right: 16px; border-width: 0 1px 1px 0; }
+
+/* Header */
+header {
+padding: calc(env(safe-area-inset-top) + 24px) 32px 0;
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+z-index: 2;
+position: relative;
+}
+
+.id-block {
+font-family: ‘Oswald’, sans-serif;
+font-weight: 700;
+font-size: 13px;
+letter-spacing: 0.3em;
+line-height: 1.4;
+}
+
+.id-block .accent { color: var(–accent-bright); }
+
+.session-info {
+text-align: right;
+font-size: 9px;
+letter-spacing: 0.25em;
+color: var(–dim);
+line-height: 1.6;
+}
+
+/* Main breath area */
+main {
+flex: 1;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+position: relative;
+z-index: 2;
+}
+
+.stage {
+font-family: ‘Oswald’, sans-serif;
+font-weight: 500;
+font-size: 11px;
+letter-spacing: 0.4em;
+color: var(–dim);
+margin-bottom: 24px;
+height: 14px;
+transition: color 0.4s ease;
+}
+
+.stage.active { color: var(–accent-bright); }
+
+.circle-wrap {
+position: relative;
+width: 280px;
+height: 280px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.ring {
+position: absolute;
+inset: 0;
+border: 1px solid var(–dim);
+border-radius: 50%;
+opacity: 0.3;
+}
+
+.ring.outer {
+inset: -20px;
+border-style: dashed;
+}
+
+.circle {
+width: 200px;
+height: 200px;
+border-radius: 50%;
+border: 1px solid var(–fg);
+display: flex;
+align-items: center;
+justify-content: center;
+transition: transform 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease;
+background: radial-gradient(circle at center, rgba(255,255,255,0.02), transparent 70%);
+}
+
+.circle.inhale {
+transform: scale(1.35);
+transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s, box-shadow 0.4s;
+border-color: var(–inhale);
+box-shadow: 0 0 60px rgba(42, 107, 140, 0.3), inset 0 0 40px rgba(42, 107, 140, 0.1);
+}
+
+.circle.hold {
+transform: scale(1.35);
+border-color: var(–hold);
+box-shadow: 0 0 60px rgba(184, 144, 48, 0.3), inset 0 0 40px rgba(184, 144, 48, 0.1);
+}
+
+.circle.exhale {
+transform: scale(0.85);
+transition: transform 8s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s, box-shadow 0.4s;
+border-color: var(–exhale);
+box-shadow: 0 0 60px rgba(107, 42, 140, 0.3), inset 0 0 40px rgba(107, 42, 140, 0.1);
+}
+
+.counter {
+font-family: ‘JetBrains Mono’, monospace;
+font-weight: 300;
+font-size: 88px;
+line-height: 1;
+letter-spacing: -0.04em;
+}
+
+.instruction {
+margin-top: 32px;
+font-family: ‘Oswald’, sans-serif;
+font-weight: 500;
+font-size: 14px;
+letter-spacing: 0.3em;
+color: var(–fg);
+text-transform: uppercase;
+height: 18px;
+transition: opacity 0.3s;
+}
+
+/* Controls */
+.controls {
+padding: 20px 32px calc(env(safe-area-inset-bottom) + 32px);
+z-index: 2;
+position: relative;
+}
+
+.progress-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 24px;
+font-size: 10px;
+letter-spacing: 0.25em;
+color: var(–dim);
+}
+
+.cycles {
+display: flex;
+gap: 6px;
+align-items: center;
+}
+
+.cycle-dot {
+width: 8px;
+height: 8px;
+border: 1px solid var(–dim);
+transition: all 0.3s;
+}
+
+.cycle-dot.done {
+background: var(–accent);
+border-color: var(–accent);
+}
+
+.cycle-dot.active {
+border-color: var(–accent-bright);
+background: var(–accent-bright);
+box-shadow: 0 0 8px var(–accent-bright);
+}
+
+.btn-row {
+display: flex;
+gap: 12px;
+}
+
+button {
+flex: 1;
+background: transparent;
+border: 1px solid var(–fg);
+color: var(–fg);
+padding: 18px;
+font-family: ‘Oswald’, sans-serif;
+font-weight: 700;
+font-size: 14px;
+letter-spacing: 0.3em;
+cursor: pointer;
+transition: all 0.2s;
+text-transform: uppercase;
+position: relative;
+}
+
+button::before {
+content: ‘’;
+position: absolute;
+top: 4px;
+left: 4px;
+width: 8px;
+height: 8px;
+border-top: 1px solid currentColor;
+border-left: 1px solid currentColor;
+opacity: 0.5;
+}
+
+button::after {
+content: ‘’;
+position: absolute;
+bottom: 4px;
+right: 4px;
+width: 8px;
+height: 8px;
+border-bottom: 1px solid currentColor;
+border-right: 1px solid currentColor;
+opacity: 0.5;
+}
+
+button.primary {
+background: var(–accent);
+border-color: var(–accent);
+color: var(–fg);
+}
+
+button.primary.running {
+background: transparent;
+border-color: var(–accent-bright);
+color: var(–accent-bright);
+}
+
+button:active {
+transform: scale(0.97);
+}
+
+/* Pulse on counter */
+@keyframes tick {
+0% { opacity: 1; }
+50% { opacity: 0.7; }
+100% { opacity: 1; }
+}
+
+.counter.tick {
+animation: tick 1s ease;
+}
+
+/* Idle state */
+.circle.idle {
+border-color: var(–dim);
+}
+
+.counter.idle {
+color: var(–dim);
+}
+</style>
+
+</head>
+<body>
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<header>
+  <div class="id-block">
+    <div>4<span class="accent">·</span>7<span class="accent">·</span>8</div>
+    <div style="font-size: 9px; color: var(--dim); margin-top: 4px;">PROTOCOL // BREATH</div>
+  </div>
+  <div class="session-info">
+    <div>SESSION <span id="sessionNum">01</span></div>
+    <div>CYCLES <span id="cycleCount">0</span>/<span id="cycleTotal">6</span></div>
+  </div>
+</header>
+
+<main>
+  <div class="stage" id="stage">— READY —</div>
+  <div class="circle-wrap">
+    <div class="ring outer"></div>
+    <div class="ring"></div>
+    <div class="circle idle" id="circle">
+      <div class="counter idle" id="counter">—</div>
+    </div>
+  </div>
+  <div class="instruction" id="instruction">TAP START</div>
+</main>
+
+<div class="controls">
+  <div class="progress-row">
+    <span>PROGRESS</span>
+    <div class="cycles" id="cycles"></div>
+  </div>
+  <div class="btn-row">
+    <button id="startBtn" class="primary">START</button>
+    <button id="resetBtn">RESET</button>
+  </div>
+</div>
+
+<script>
+  const TOTAL_CYCLES = 6;
+  const PHASES = [
+    { name: 'INHALE',  instruction: 'BREATHE IN',  duration: 4, cssClass: 'inhale' },
+    { name: 'HOLD',    instruction: 'HOLD',        duration: 7, cssClass: 'hold' },
+    { name: 'EXHALE',  instruction: 'BREATHE OUT', duration: 8, cssClass: 'exhale' }
+  ];
+
+  const stageEl = document.getElementById('stage');
+  const counterEl = document.getElementById('counter');
+  const circleEl = document.getElementById('circle');
+  const instructionEl = document.getElementById('instruction');
+  const startBtn = document.getElementById('startBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const cyclesEl = document.getElementById('cycles');
+  const cycleCountEl = document.getElementById('cycleCount');
+  const sessionNumEl = document.getElementById('sessionNum');
+
+  let running = false;
+  let currentCycle = 0;
+  let currentPhase = 0;
+  let timeLeft = 0;
+  let interval = null;
+  let sessionCount = parseInt(localStorage.getItem('s478_session') || '0', 10);
+
+  // Build cycle dots
+  function buildCycles() {
+    cyclesEl.innerHTML = '';
+    for (let i = 0; i < TOTAL_CYCLES; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'cycle-dot';
+      cyclesEl.appendChild(dot);
+    }
+  }
+
+  function updateCycles() {
+    const dots = cyclesEl.querySelectorAll('.cycle-dot');
+    dots.forEach((dot, i) => {
+      dot.className = 'cycle-dot';
+      if (i < currentCycle) dot.classList.add('done');
+      else if (i === currentCycle && running) dot.classList.add('active');
+    });
+    cycleCountEl.textContent = String(currentCycle).padStart(2, '0');
+  }
+
+  function updateSessionDisplay() {
+    sessionNumEl.textContent = String(sessionCount + 1).padStart(2, '0');
+  }
+
+  // Haptic feedback (works on iOS Safari with user gesture)
+  function haptic(type = 'light') {
+    if (navigator.vibrate) {
+      if (type === 'phase') navigator.vibrate(50);
+      else if (type === 'tick') navigator.vibrate(15);
+      else if (type === 'done') navigator.vibrate([100, 50, 100]);
+    }
+  }
+
+  // Audio - Tibetan singing bowl synthesis
+  let audioCtx = null;
+  let masterReverb = null;
+
+  function initAudio() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Build a simple convolution reverb for that "spacious bowl" feel
+    masterReverb = audioCtx.createConvolver();
+    const sampleRate = audioCtx.sampleRate;
+    const length = sampleRate * 3; // 3 second reverb tail
+    const impulse = audioCtx.createBuffer(2, length, sampleRate);
+    for (let ch = 0; ch < 2; ch++) {
+      const data = impulse.getChannelData(ch);
+      for (let i = 0; i < length; i++) {
+        // Exponential decay with noise = natural reverb
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2.5);
+      }
+    }
+    masterReverb.buffer = impulse;
+  }
+
+  // Tibetan singing bowl: fundamental + inharmonic partials, slow attack, long decay, with shimmer
+  function bowl(fundamental = 392, duration = 3.5, volume = 0.18) {
+    try {
+      initAudio();
+      const now = audioCtx.currentTime;
+
+      // Singing bowls have inharmonic partials (not pure integer multiples)
+      // These ratios approximate a real bronze bowl's spectrum
+      const partials = [
+        { ratio: 1.0,  gain: 1.0,  detune: 0 },
+        { ratio: 2.76, gain: 0.55, detune: -3 },
+        { ratio: 5.40, gain: 0.30, detune: 5 },
+        { ratio: 8.93, gain: 0.15, detune: -2 },
+        { ratio: 13.3, gain: 0.08, detune: 4 }
+      ];
+
+      // Master gain bus for the bowl
+      const bowlBus = audioCtx.createGain();
+      bowlBus.gain.value = volume;
+
+      // Lowpass to soften high partials
+      const lowpass = audioCtx.createBiquadFilter();
+      lowpass.type = 'lowpass';
+      lowpass.frequency.value = 4500;
+      lowpass.Q.value = 0.5;
+
+      // Reverb send (parallel)
+      const reverbSend = audioCtx.createGain();
+      reverbSend.gain.value = 0.45;
+
+      bowlBus.connect(lowpass);
+      lowpass.connect(audioCtx.destination);
+      lowpass.connect(reverbSend);
+      reverbSend.connect(masterReverb);
+      masterReverb.connect(audioCtx.destination);
+
+      // Each partial = oscillator with its own envelope (slight attack offset = "shimmer")
+      partials.forEach((p, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = fundamental * p.ratio;
+        osc.detune.value = p.detune;
+
+        // Subtle FM-like wobble for organic feel
+        const lfo = audioCtx.createOscillator();
+        const lfoGain = audioCtx.createGain();
+        lfo.frequency.value = 4 + i * 0.7;
+        lfoGain.gain.value = 1.5 + i * 0.5;
+        lfo.connect(lfoGain);
+        lfoGain.connect(osc.frequency);
+
+        // Envelope: very soft attack, long exponential decay
+        const attackTime = 0.08 + i * 0.02;
+        const peakTime = now + attackTime;
+        const endTime = now + duration;
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(p.gain, peakTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, endTime);
+
+        osc.connect(gain);
+        gain.connect(bowlBus);
+
+        osc.start(now);
+        lfo.start(now);
+        osc.stop(endTime + 0.1);
+        lfo.stop(endTime + 0.1);
+      });
+    } catch (e) {}
+  }
+
+  // Wrapper kept for compatibility with existing calls
+  function beep(freq, duration, volume) {
+    bowl(freq, duration || 3, volume || 0.18);
+  }
+
+  function setPhase(phaseIdx) {
+    const phase = PHASES[phaseIdx];
+    timeLeft = phase.duration;
+
+    stageEl.textContent = '— ' + phase.name + ' —';
+    stageEl.classList.add('active');
+    instructionEl.textContent = phase.instruction;
+
+    circleEl.className = 'circle ' + phase.cssClass;
+    counterEl.classList.remove('idle');
+    counterEl.textContent = timeLeft;
+
+    haptic('phase');
+    // Pentatonic-tuned bowls — grave for inhale, medium for hold, deepest for exhale
+    // Frequencies: A3 (220Hz), E4 (330Hz), C4 (262Hz) — peaceful, harmonious
+    if (phaseIdx === 0) bowl(330, 4, 0.20);       // INHALE - rising, bright
+    else if (phaseIdx === 1) bowl(392, 7, 0.16);  // HOLD - sustained mid
+    else bowl(220, 8, 0.22);                       // EXHALE - deep, grounding
+  }
+
+  function tick() {
+    timeLeft--;
+    if (timeLeft > 0) {
+      counterEl.textContent = timeLeft;
+      counterEl.classList.remove('tick');
+      void counterEl.offsetWidth;
+      counterEl.classList.add('tick');
+    } else {
+      // Phase complete
+      currentPhase++;
+      if (currentPhase >= PHASES.length) {
+        currentPhase = 0;
+        currentCycle++;
+        updateCycles();
+        if (currentCycle >= TOTAL_CYCLES) {
+          finishSession();
+          return;
+        }
+      }
+      setPhase(currentPhase);
+    }
+  }
+
+  function start() {
+    if (running) {
+      pause();
+      return;
+    }
+    running = true;
+    startBtn.textContent = 'PAUSE';
+    startBtn.classList.add('running');
+    if (currentCycle === 0 && currentPhase === 0 && timeLeft === 0) {
+      setPhase(0);
+    } else {
+      // Resume mid-phase
+      counterEl.classList.remove('idle');
+      circleEl.className = 'circle ' + PHASES[currentPhase].cssClass;
+      stageEl.textContent = '— ' + PHASES[currentPhase].name + ' —';
+      stageEl.classList.add('active');
+      instructionEl.textContent = PHASES[currentPhase].instruction;
+    }
+    updateCycles();
+    interval = setInterval(tick, 1000);
+  }
+
+  function pause() {
+    running = false;
+    clearInterval(interval);
+    startBtn.textContent = 'RESUME';
+    startBtn.classList.remove('running');
+    instructionEl.textContent = 'PAUSED';
+    updateCycles();
+  }
+
+  function reset() {
+    running = false;
+    clearInterval(interval);
+    currentCycle = 0;
+    currentPhase = 0;
+    timeLeft = 0;
+    startBtn.textContent = 'START';
+    startBtn.classList.remove('running');
+    stageEl.textContent = '— READY —';
+    stageEl.classList.remove('active');
+    instructionEl.textContent = 'TAP START';
+    circleEl.className = 'circle idle';
+    counterEl.className = 'counter idle';
+    counterEl.textContent = '—';
+    updateCycles();
+  }
+
+  function finishSession() {
+    running = false;
+    clearInterval(interval);
+    sessionCount++;
+    localStorage.setItem('s478_session', sessionCount);
+    updateSessionDisplay();
+
+    stageEl.textContent = '— COMPLETE —';
+    stageEl.style.color = 'var(--accent-bright)';
+    instructionEl.textContent = 'MISSION ACCOMPLISHED';
+    counterEl.textContent = '✓';
+    counterEl.classList.add('idle');
+    circleEl.className = 'circle';
+    circleEl.style.borderColor = 'var(--accent-bright)';
+    circleEl.style.boxShadow = '0 0 80px rgba(216, 21, 21, 0.4)';
+
+    haptic('done');
+    // Final bowl sequence - a gentle ascending chord
+    bowl(220, 5, 0.20);
+    setTimeout(() => bowl(330, 5, 0.18), 600);
+    setTimeout(() => bowl(440, 6, 0.16), 1200);
+
+    startBtn.textContent = 'AGAIN';
+    startBtn.classList.remove('running');
+
+    setTimeout(() => {
+      currentCycle = 0;
+      currentPhase = 0;
+      timeLeft = 0;
+      circleEl.style.borderColor = '';
+      circleEl.style.boxShadow = '';
+      stageEl.style.color = '';
+    }, 100);
+  }
+
+  startBtn.addEventListener('click', start);
+  resetBtn.addEventListener('click', reset);
+
+  // Prevent screen sleep (best effort)
+  let wakeLock = null;
+  async function requestWakeLock() {
+    try {
+      if ('wakeLock' in navigator) {
+        wakeLock = await navigator.wakeLock.request('screen');
+      }
+    } catch (e) {}
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && running) requestWakeLock();
+  });
+
+  // Init
+  buildCycles();
+  updateSessionDisplay();
+</script>
+
+</body>
+</html>

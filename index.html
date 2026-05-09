@@ -7,18 +7,21 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="4-7-8">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#0A0A0A">
 <title>4-7-8 BREATH</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #000000;
-    --fg: #8B0000;
-    --fg-bright: #C41010;
-    --dim: #2A0808;
-    --dim-text: #4A1010;
-    --inhale: #6B0000;
-    --hold: #8B0808;
-    --exhale: #4A0000;
+    --bg: #0A0A0A;
+    --fg: #E8E8E8;
+    --dim: #4A4A4A;
+    --accent: #A00000;
+    --accent-bright: #D81515;
+    --inhale: #2A6B8C;
+    --hold: #B89030;
+    --exhale: #6B2A8C;
   }
 
 - { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -29,7 +32,7 @@ width: 100%;
 overflow: hidden;
 background: var(–bg);
 color: var(–fg);
-font-family: ‘SF Mono’, ‘Menlo’, ‘Courier New’, monospace;
+font-family: ‘JetBrains Mono’, monospace;
 user-select: none;
 -webkit-user-select: none;
 overscroll-behavior: none;
@@ -42,12 +45,23 @@ padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset
 position: relative;
 }
 
-/* Corner marks */
+/* Grain background */
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 200 200’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘n’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘3’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23n)’ opacity=‘0.4’/%3E%3C/svg%3E”);
+opacity: 0.05;
+pointer-events: none;
+z-index: 1;
+}
+
+/* Corner marks - tactical style */
 .corner {
 position: fixed;
 width: 18px;
 height: 18px;
-border-color: var(–dim-text);
+border-color: var(–dim);
 border-style: solid;
 z-index: 5;
 pointer-events: none;
@@ -68,32 +82,24 @@ position: relative;
 }
 
 .id-block {
+font-family: ‘Oswald’, sans-serif;
 font-weight: 700;
 font-size: 13px;
 letter-spacing: 0.3em;
 line-height: 1.4;
-color: var(–fg);
 }
 
-.id-block .accent { color: var(–fg-bright); }
-
-.id-block .sub {
-font-size: 9px;
-color: var(–dim-text);
-margin-top: 4px;
-font-weight: 400;
-}
+.id-block .accent { color: var(–accent-bright); }
 
 .session-info {
 text-align: right;
 font-size: 9px;
 letter-spacing: 0.25em;
-color: var(–dim-text);
+color: var(–dim);
 line-height: 1.6;
-font-weight: 400;
 }
 
-/* Main */
+/* Main breath area */
 main {
 flex: 1;
 display: flex;
@@ -105,16 +111,17 @@ z-index: 2;
 }
 
 .stage {
-font-weight: 700;
+font-family: ‘Oswald’, sans-serif;
+font-weight: 500;
 font-size: 11px;
 letter-spacing: 0.4em;
-color: var(–dim-text);
+color: var(–dim);
 margin-bottom: 24px;
 height: 14px;
 transition: color 0.4s ease;
 }
 
-.stage.active { color: var(–fg-bright); }
+.stage.active { color: var(–accent-bright); }
 
 .circle-wrap {
 position: relative;
@@ -128,9 +135,9 @@ justify-content: center;
 .ring {
 position: absolute;
 inset: 0;
-border: 1px solid var(–dim-text);
+border: 1px solid var(–dim);
 border-radius: 50%;
-opacity: 0.4;
+opacity: 0.3;
 }
 
 .ring.outer {
@@ -147,43 +154,41 @@ display: flex;
 align-items: center;
 justify-content: center;
 transition: transform 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease;
-background: radial-gradient(circle at center, rgba(139, 0, 0, 0.08), transparent 70%);
+background: radial-gradient(circle at center, rgba(255,255,255,0.02), transparent 70%);
 }
 
 .circle.inhale {
 transform: scale(1.35);
 transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s, box-shadow 0.4s;
-border-color: var(–fg-bright);
-box-shadow: 0 0 60px rgba(196, 16, 16, 0.4), inset 0 0 40px rgba(139, 0, 0, 0.2);
+border-color: var(–inhale);
+box-shadow: 0 0 60px rgba(42, 107, 140, 0.3), inset 0 0 40px rgba(42, 107, 140, 0.1);
 }
 
 .circle.hold {
 transform: scale(1.35);
-border-color: var(–fg-bright);
-box-shadow: 0 0 80px rgba(196, 16, 16, 0.5), inset 0 0 50px rgba(139, 0, 0, 0.3);
+border-color: var(–hold);
+box-shadow: 0 0 60px rgba(184, 144, 48, 0.3), inset 0 0 40px rgba(184, 144, 48, 0.1);
 }
 
 .circle.exhale {
 transform: scale(0.85);
 transition: transform 8s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s, box-shadow 0.4s;
-border-color: var(–fg);
-box-shadow: 0 0 40px rgba(139, 0, 0, 0.3), inset 0 0 30px rgba(74, 0, 0, 0.2);
+border-color: var(–exhale);
+box-shadow: 0 0 60px rgba(107, 42, 140, 0.3), inset 0 0 40px rgba(107, 42, 140, 0.1);
 }
 
 .counter {
-font-weight: 200;
+font-family: ‘JetBrains Mono’, monospace;
+font-weight: 300;
 font-size: 88px;
 line-height: 1;
 letter-spacing: -0.04em;
-color: var(–fg);
-font-family: ‘SF Mono’, ‘Menlo’, monospace;
 }
-
-.counter.idle { color: var(–dim-text); }
 
 .instruction {
 margin-top: 32px;
-font-weight: 700;
+font-family: ‘Oswald’, sans-serif;
+font-weight: 500;
 font-size: 14px;
 letter-spacing: 0.3em;
 color: var(–fg);
@@ -206,8 +211,7 @@ align-items: center;
 margin-bottom: 24px;
 font-size: 10px;
 letter-spacing: 0.25em;
-color: var(–dim-text);
-font-weight: 400;
+color: var(–dim);
 }
 
 .cycles {
@@ -219,19 +223,19 @@ align-items: center;
 .cycle-dot {
 width: 8px;
 height: 8px;
-border: 1px solid var(–dim-text);
+border: 1px solid var(–dim);
 transition: all 0.3s;
 }
 
 .cycle-dot.done {
-background: var(–fg);
-border-color: var(–fg);
+background: var(–accent);
+border-color: var(–accent);
 }
 
 .cycle-dot.active {
-border-color: var(–fg-bright);
-background: var(–fg-bright);
-box-shadow: 0 0 8px var(–fg-bright);
+border-color: var(–accent-bright);
+background: var(–accent-bright);
+box-shadow: 0 0 8px var(–accent-bright);
 }
 
 .btn-row {
@@ -245,7 +249,7 @@ background: transparent;
 border: 1px solid var(–fg);
 color: var(–fg);
 padding: 18px;
-font-family: inherit;
+font-family: ‘Oswald’, sans-serif;
 font-weight: 700;
 font-size: 14px;
 letter-spacing: 0.3em;
@@ -253,9 +257,6 @@ cursor: pointer;
 transition: all 0.2s;
 text-transform: uppercase;
 position: relative;
--webkit-appearance: none;
-appearance: none;
-border-radius: 0;
 }
 
 button::before {
@@ -283,25 +284,25 @@ opacity: 0.5;
 }
 
 button.primary {
-background: var(–fg);
-border-color: var(–fg);
-color: #000000;
+background: var(–accent);
+border-color: var(–accent);
+color: var(–fg);
 }
 
 button.primary.running {
 background: transparent;
-border-color: var(–fg-bright);
-color: var(–fg-bright);
+border-color: var(–accent-bright);
+color: var(–accent-bright);
 }
 
 button:active {
 transform: scale(0.97);
-opacity: 0.7;
 }
 
+/* Pulse on counter */
 @keyframes tick {
 0% { opacity: 1; }
-50% { opacity: 0.6; }
+50% { opacity: 0.7; }
 100% { opacity: 1; }
 }
 
@@ -309,8 +310,13 @@ opacity: 0.7;
 animation: tick 1s ease;
 }
 
+/* Idle state */
 .circle.idle {
-border-color: var(–dim-text);
+border-color: var(–dim);
+}
+
+.counter.idle {
+color: var(–dim);
 }
 </style>
 
@@ -325,7 +331,7 @@ border-color: var(–dim-text);
 <header>
   <div class="id-block">
     <div>4<span class="accent">·</span>7<span class="accent">·</span>8</div>
-    <div class="sub">PROTOCOL // BREATH</div>
+    <div style="font-size: 9px; color: var(--dim); margin-top: 4px;">PROTOCOL // BREATH</div>
   </div>
   <div class="session-info">
     <div>SESSION <span id="sessionNum">01</span></div>
@@ -381,6 +387,7 @@ border-color: var(–dim-text);
   let interval = null;
   let sessionCount = parseInt(localStorage.getItem('s478_session') || '0', 10);
 
+  // Build cycle dots
   function buildCycles() {
     cyclesEl.innerHTML = '';
     for (let i = 0; i < TOTAL_CYCLES; i++) {
@@ -404,6 +411,7 @@ border-color: var(–dim-text);
     sessionNumEl.textContent = String(sessionCount + 1).padStart(2, '0');
   }
 
+  // Haptic feedback (works on iOS Safari with user gesture)
   function haptic(type = 'light') {
     if (navigator.vibrate) {
       if (type === 'phase') navigator.vibrate(50);
@@ -419,23 +427,30 @@ border-color: var(–dim-text);
   function initAudio() {
     if (audioCtx) return;
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Build a simple convolution reverb for that "spacious bowl" feel
     masterReverb = audioCtx.createConvolver();
     const sampleRate = audioCtx.sampleRate;
-    const length = sampleRate * 3;
+    const length = sampleRate * 3; // 3 second reverb tail
     const impulse = audioCtx.createBuffer(2, length, sampleRate);
     for (let ch = 0; ch < 2; ch++) {
       const data = impulse.getChannelData(ch);
       for (let i = 0; i < length; i++) {
+        // Exponential decay with noise = natural reverb
         data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2.5);
       }
     }
     masterReverb.buffer = impulse;
   }
 
+  // Tibetan singing bowl: fundamental + inharmonic partials, slow attack, long decay, with shimmer
   function bowl(fundamental = 392, duration = 3.5, volume = 0.18) {
     try {
       initAudio();
       const now = audioCtx.currentTime;
+
+      // Singing bowls have inharmonic partials (not pure integer multiples)
+      // These ratios approximate a real bronze bowl's spectrum
       const partials = [
         { ratio: 1.0,  gain: 1.0,  detune: 0 },
         { ratio: 2.76, gain: 0.55, detune: -3 },
@@ -443,39 +458,55 @@ border-color: var(–dim-text);
         { ratio: 8.93, gain: 0.15, detune: -2 },
         { ratio: 13.3, gain: 0.08, detune: 4 }
       ];
+
+      // Master gain bus for the bowl
       const bowlBus = audioCtx.createGain();
       bowlBus.gain.value = volume;
+
+      // Lowpass to soften high partials
       const lowpass = audioCtx.createBiquadFilter();
       lowpass.type = 'lowpass';
       lowpass.frequency.value = 4500;
       lowpass.Q.value = 0.5;
+
+      // Reverb send (parallel)
       const reverbSend = audioCtx.createGain();
       reverbSend.gain.value = 0.45;
+
       bowlBus.connect(lowpass);
       lowpass.connect(audioCtx.destination);
       lowpass.connect(reverbSend);
       reverbSend.connect(masterReverb);
       masterReverb.connect(audioCtx.destination);
+
+      // Each partial = oscillator with its own envelope (slight attack offset = "shimmer")
       partials.forEach((p, i) => {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = 'sine';
         osc.frequency.value = fundamental * p.ratio;
         osc.detune.value = p.detune;
+
+        // Subtle FM-like wobble for organic feel
         const lfo = audioCtx.createOscillator();
         const lfoGain = audioCtx.createGain();
         lfo.frequency.value = 4 + i * 0.7;
         lfoGain.gain.value = 1.5 + i * 0.5;
         lfo.connect(lfoGain);
         lfoGain.connect(osc.frequency);
+
+        // Envelope: very soft attack, long exponential decay
         const attackTime = 0.08 + i * 0.02;
         const peakTime = now + attackTime;
         const endTime = now + duration;
+
         gain.gain.setValueAtTime(0.0001, now);
         gain.gain.exponentialRampToValueAtTime(p.gain, peakTime);
         gain.gain.exponentialRampToValueAtTime(0.0001, endTime);
+
         osc.connect(gain);
         gain.connect(bowlBus);
+
         osc.start(now);
         lfo.start(now);
         osc.stop(endTime + 0.1);
@@ -484,19 +515,29 @@ border-color: var(–dim-text);
     } catch (e) {}
   }
 
+  // Wrapper kept for compatibility with existing calls
+  function beep(freq, duration, volume) {
+    bowl(freq, duration || 3, volume || 0.18);
+  }
+
   function setPhase(phaseIdx) {
     const phase = PHASES[phaseIdx];
     timeLeft = phase.duration;
+
     stageEl.textContent = '— ' + phase.name + ' —';
     stageEl.classList.add('active');
     instructionEl.textContent = phase.instruction;
+
     circleEl.className = 'circle ' + phase.cssClass;
     counterEl.classList.remove('idle');
     counterEl.textContent = timeLeft;
+
     haptic('phase');
-    if (phaseIdx === 0) bowl(330, 4, 0.20);
-    else if (phaseIdx === 1) bowl(392, 7, 0.16);
-    else bowl(220, 8, 0.22);
+    // Pentatonic-tuned bowls — grave for inhale, medium for hold, deepest for exhale
+    // Frequencies: A3 (220Hz), E4 (330Hz), C4 (262Hz) — peaceful, harmonious
+    if (phaseIdx === 0) bowl(330, 4, 0.20);       // INHALE - rising, bright
+    else if (phaseIdx === 1) bowl(392, 7, 0.16);  // HOLD - sustained mid
+    else bowl(220, 8, 0.22);                       // EXHALE - deep, grounding
   }
 
   function tick() {
@@ -507,6 +548,7 @@ border-color: var(–dim-text);
       void counterEl.offsetWidth;
       counterEl.classList.add('tick');
     } else {
+      // Phase complete
       currentPhase++;
       if (currentPhase >= PHASES.length) {
         currentPhase = 0;
@@ -532,6 +574,7 @@ border-color: var(–dim-text);
     if (currentCycle === 0 && currentPhase === 0 && timeLeft === 0) {
       setPhase(0);
     } else {
+      // Resume mid-phase
       counterEl.classList.remove('idle');
       circleEl.className = 'circle ' + PHASES[currentPhase].cssClass;
       stageEl.textContent = '— ' + PHASES[currentPhase].name + ' —';
@@ -574,20 +617,25 @@ border-color: var(–dim-text);
     sessionCount++;
     localStorage.setItem('s478_session', sessionCount);
     updateSessionDisplay();
+
     stageEl.textContent = '— COMPLETE —';
-    stageEl.style.color = 'var(--fg-bright)';
+    stageEl.style.color = 'var(--accent-bright)';
     instructionEl.textContent = 'MISSION ACCOMPLISHED';
     counterEl.textContent = '✓';
     counterEl.classList.add('idle');
     circleEl.className = 'circle';
-    circleEl.style.borderColor = 'var(--fg-bright)';
-    circleEl.style.boxShadow = '0 0 80px rgba(196, 16, 16, 0.5)';
+    circleEl.style.borderColor = 'var(--accent-bright)';
+    circleEl.style.boxShadow = '0 0 80px rgba(216, 21, 21, 0.4)';
+
     haptic('done');
+    // Final bowl sequence - a gentle ascending chord
     bowl(220, 5, 0.20);
     setTimeout(() => bowl(330, 5, 0.18), 600);
     setTimeout(() => bowl(440, 6, 0.16), 1200);
+
     startBtn.textContent = 'AGAIN';
     startBtn.classList.remove('running');
+
     setTimeout(() => {
       currentCycle = 0;
       currentPhase = 0;
@@ -601,6 +649,7 @@ border-color: var(–dim-text);
   startBtn.addEventListener('click', start);
   resetBtn.addEventListener('click', reset);
 
+  // Prevent screen sleep (best effort)
   let wakeLock = null;
   async function requestWakeLock() {
     try {
@@ -613,6 +662,7 @@ border-color: var(–dim-text);
     if (document.visibilityState === 'visible' && running) requestWakeLock();
   });
 
+  // Init
   buildCycles();
   updateSessionDisplay();
 </script>
